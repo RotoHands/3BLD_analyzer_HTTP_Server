@@ -1,7 +1,7 @@
 import http
 from http.server import  BaseHTTPRequestHandler
 import os
-from main import main
+from main import parse
 
 # Create custom HTTPRequestHandler class
 
@@ -17,7 +17,7 @@ class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', "text/html")
             self.end_headers()
-            self.wfile.write(main().encode())#main().encode())
+            self.wfile.write(parse().encode())#main().encode())
         except IOError:
             self.send_error(404, 'file not found')
 
