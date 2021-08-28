@@ -31,7 +31,7 @@ def run():
 
     # ip and port of servr
     # by default http server port is 80
-    server_address = ('www.rotohands-bld-parser.herokuapp.com', int(PORT))
+    server_address = ('0.0.0.0', int(PORT))
     httpd = HTTPServer(server_address, KodeFunHTTPRequestHandler)
     print('http server is running...')
     httpd.serve_forever()
