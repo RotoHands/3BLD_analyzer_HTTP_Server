@@ -3,11 +3,11 @@ import os
 from main import main
 
 # Create custom HTTPRequestHandler class
+
+PORT = os.environ['PORT']
 class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
 
     # handle GET command
- 
-
     def do_GET(self):
         try:
             if self.path.endswith('/new'):
@@ -31,7 +31,7 @@ def run():
 
     # ip and port of servr
     # by default http server port is 80
-    server_address = ('', os.environ['PORT'])
+    server_address = ('www.rotohands-bld-parser.herokuapp.com', int(PORT))
     httpd = HTTPServer(server_address, KodeFunHTTPRequestHandler)
     print('http server is running...')
     httpd.serve_forever()
