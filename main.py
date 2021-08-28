@@ -11,7 +11,7 @@ def parse():
 
     use_txt_file= True if os.environ.get('USE_TXT_FILE') == "True" else False
     if use_txt_file:
-        with open(os.environ.get("TXT_FILE_OF_SOLVE"), "r") as f:
+        with open(os.environ.get("TXT_FILE_OF_SOLVE"), "r") as f :
             data = f.readlines()
             SCRAMBLE = data[0]
             SOLVE = " ".join(data[1:])
