@@ -5,8 +5,8 @@ from main import main
 
 # Create custom HTTPRequestHandler class
 
-# PORT = os.environ['PORT']
-PORT = 8080
+PORT = os.environ['PORT']
+
 class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
 
     # handle GET command
