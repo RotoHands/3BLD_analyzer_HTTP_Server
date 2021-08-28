@@ -1,27 +1,41 @@
-import http.server
 from http.server import HTTPServer, BaseHTTPRequestHandler
-import socketserver
-import threading
 import os
-PORT = os.environ['PORT']
+from main import main
 
-class myHandler(BaseHTTPRequestHandler):
+# Create custom HTTPRequestHandler class
+class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
+
+    # handle GET command
+ 
+
     def do_GET(self):
-        self.write("Heroku is awesome")
+        try:
+            if self.path.endswith('/new'):
+                # send code 200 response
+                self.send_response(200)
+                msg = main().encode()
 
-class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    pass
+                # send header first
+                self.send_header('Content-type', msg)
+                self.end_headers()
 
-try:
-    server = ThreadedTCPServer(('', PORT), myHandler)
-    print ('Started httpserver on port ' , PORT)
-    ip,port = server.server_address
-    server_thread = threading.Thread(target=server.serve_forever)
-    server_thread.daemon = True
-    server_thread.start()
-    allow_reuse_address = True
-    server.serve_forever()
+                # send file content to client
+                return
 
-except KeyboardInterrupt:
-    print ('CTRL + C RECEIVED - Shutting down the REST server')
-    server.socket.close()
+        except IOError:
+            self.send_error(404, 'file not found')
+
+
+def run():
+    print('http server is starting...')
+
+    # ip and port of servr
+    # by default http server port is 80
+    server_address = ('', os.environ['PORT'])
+    httpd = HTTPServer(server_address, KodeFunHTTPRequestHandler)
+    print('http server is running...')
+    httpd.serve_forever()
+
+
+if __name__ == '__main__':
+    run()

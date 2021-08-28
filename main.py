@@ -23,7 +23,7 @@ def main():
     solve_str = cube.url
     pyperclip.copy(solve_str)
 
-    print(solve_str)
+    return solve_str
     #print(*cube.solve_stats, sep="\n")
 
 if __name__ == '__main__':
