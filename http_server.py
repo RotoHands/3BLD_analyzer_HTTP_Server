@@ -36,7 +36,7 @@ class S(BaseHTTPRequestHandler):
 
     def _set_response(self):
         self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+        self.send_header('Content-type', 'text/html; charset=utf-8')
         self.end_headers()
 
     def do_POST(self):
@@ -47,7 +47,7 @@ class S(BaseHTTPRequestHandler):
             solve_str = parse(dict_params)
 
             self._set_response()
-            self.wfile.write(bytearray((solve_str).encode('windows-1255')))
+            self.wfile.write(bytearray((solve_str).encode('utf-8')))
         except Exception as e:
            self.send_error(404, 'error')
 

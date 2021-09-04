@@ -25,9 +25,10 @@ def client_example():
               "MEMO" : 23.32
     }
 
-    # r = requests.post("http://rotohands-bld-parser.herokuapp.com/", data=params_solve)
-    r = requests.post("http://127.0.0.1:8080", data=params_solve)
+    r = requests.post("http://rotohands-bld-parser.herokuapp.com/", data=params_solve)
+    # r = requests.post("http://127.0.0.1:8080", data=params_solve)
     import pyperclip
+    print(r.text)
     pyperclip.copy(r.text)
 
 
