@@ -1,3 +1,4 @@
+import ast
 from bld_comm_parser import solve_parser, reverse_alg, alg_maker
 import permutation
 import re
@@ -88,7 +89,7 @@ class Cube:
         initiate the environment variables from .env file to the class attributes
         """
 
-        load_dotenv()
+        # load_dotenv()
         self.smart_cube = True if os.environ.get("SMART_CUBE") == "True" else False
         self.gen_parsed_to_cubedb = True if os.environ.get("GEN_PARSED_TO_CUBEDB") == "True" else False
         self.name_of_solve = os.environ.get("NAME_OF_SOLVE")
@@ -100,8 +101,10 @@ class Cube:
         self.gen_with_moves = True if os.environ.get("GEN_WITH_MOVE_COUNT") == "True" else False
         self.buffer_ed = self.get_buffer_ed(os.environ.get("EDGES_BUFFER"))
         self.buffer_cor = self.get_buffer_cor(os.environ.get("CORNER_BUFFER"))
-        self.path_to_lp = os.environ.get("PATH_LETTER_PAIR_FILE")
-        self.dict_lp = self.load_letter_pairs_dict()
+        self.path_to_lp = "sticker_letter_pairs.txt" #os.environ.get("PATH_LETTER_PAIR_FILE")
+        # self.dict_lp = self.load_letter_pairs_dict()
+        self.dict_lp = ast.literal_eval(os.environ.get("LETTER_PAIRS_DICT"))
+
 
     def r(self):
         self.current_perm =  self.R * self.current_perm
