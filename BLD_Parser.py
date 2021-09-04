@@ -519,8 +519,10 @@ class Cube:
         """
         generates the solve to a text format
         """
+        # success = True if self.solve_stats[-1]['cor'] == 8 and self.solve_stats[-1]['ed'] == 12 else False
+        # count = 0
+        # self.url = "{}\n{} ({})".format(self.)
 
-        count = 0
         self.url = "scramble: \n"
         for move in self.scramble.split():
             self.url += "{} ".format(move)

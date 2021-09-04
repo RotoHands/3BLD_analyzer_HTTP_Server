@@ -1,19 +1,10 @@
 # -*- coding: utf-8 -*-
 import http
 from http.server import  BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
 from werkzeug import urls
-
 import os
-import json
-from main import parse
-import simplejson
-# Create custom HTTPRequestHandler class
+from BLD_Parser import parse_solve, parse_smart_cube_solve
 
-# PORT = os.environ['PORT']
-from dotenv import load_dotenv
-import os
-from BLD_Parser import parse_solve, parse_smart_cube_solve, parse_url
 def init_env_var(dict_params):
 
     os.environ["SMART_CUBE"] = "True" if dict_params["SMART_CUBE"] == "True" else "False"
@@ -36,10 +27,8 @@ def init_env_var(dict_params):
 def parse(dict_params):
     init_env_var(dict_params)
     cube = parse_solve(dict_params["SCRAMBLE"], dict_params["SOLVE"])
-    print("here 1")
     if cube.smart_cube:
         cube = parse_smart_cube_solve(cube)
-        print("here 2")
     solve_str = cube.url
     return solve_str
 
@@ -74,17 +63,16 @@ class S(BaseHTTPRequestHandler):
         self.wfile.write((solve_str).encode('iso-8859-8'))
 
 
-def run():
-    print('http server is starting...')
-
-    # ip and port of servr
-    # by default http server port is 80
-    # server_address = ('0.0.0.0', int(PORT))
-    server_address = ('127.0.0.1', 8080)
+def run_http_server():
+    PORT = os.environ['PORT']
+    server_address = ('0.0.0.0', int(PORT))
+    # server_address = ('127.0.0.1', 8080)
     httpd = http.server.HTTPServer(server_address, S)
     print('http server is running...')
     httpd.serve_forever()
 
+def main():
+    pass
 
 if __name__ == '__main__':
-    run()
+    main()
