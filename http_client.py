@@ -8,7 +8,7 @@ def client_example():
         data = f.readlines()
         SCRAMBLE = data[0]
         SOLVE = " ".join(data[1:])
-    letter_pair_dict = load_letter_pairs_dict("sticker_HEB.txt")
+    letter_pair_dict = load_letter_pairs_dict("sticker_letter_pairs.txt")
     params_solve = { "DIFF_BETWEEN_ALGS" : 0.89,
               "SMART_CUBE": True,
               "COMMS_UNPARSED" :False,
@@ -17,7 +17,7 @@ def client_example():
               "PARSE_TO_LETTER_PAIR": True ,
               "GEN_WITH_MOVE_COUNT" : True,
               "LETTER_PAIRS_DICT" : letter_pair_dict.__str__(),
-              "GEN_PARSED_TO_CUBEDB" : False,
+              "GEN_PARSED_TO_CUBEDB" : True,
               "NAME_OF_SOLVE" : "example_smart_cube",
               "TIME_SOLVE" : 56.12,
               "SCRAMBLE" : SCRAMBLE,
@@ -25,9 +25,10 @@ def client_example():
               "MEMO" : 23.32
     }
 
-    r = requests.post("http://rotohands-bld-parser.herokuapp.com/", data=params_solve)
-    # r = requests.post("http://127.0.0.1:8080", data=params_solve)
-    print(r.text)
+    # r = requests.post("http://rotohands-bld-parser.herokuapp.com/", data=params_solve)
+    r = requests.post("http://127.0.0.1:8080", data=params_solve)
+    import pyperclip
+    pyperclip.copy(r.text)
 
 
 def load_letter_pairs_dict(path_letter_pair):
@@ -44,3 +45,8 @@ def load_letter_pairs_dict(path_letter_pair):
             dict_lp[split_data[0]] = split_data[1]
     return (dict_lp)
 
+def main():
+    client_example()
+
+if __name__ == '__main__':
+    main()
