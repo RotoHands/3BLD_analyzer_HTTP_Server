@@ -3,6 +3,7 @@ import http
 from http.server import  BaseHTTPRequestHandler
 from werkzeug import urls
 import os
+import json
 from BLD_Parser import parse_solve, parse_smart_cube_solve
 
 def init_env_var(dict_params):
@@ -33,23 +34,31 @@ def parse(dict_params):
     return solve_str
 
 class S(BaseHTTPRequestHandler):
-
     def _set_response(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html; charset=utf-8')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        # self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        # self.send_header('Access-Control-Allow-Credentials', 'true')
+        self.send_header('Access-Control-Allow-Headers', "*")
         self.end_headers()
 
     def do_POST(self):
         try:
             content_length = int(self.headers['Content-Length'])  # <--- Gets the size of data
             post_data = self.rfile.read(content_length)  # <--- Gets the data itself
-            dict_params = urls.url_decode(post_data).to_dict()
-            solve_str = parse(dict_params)
-
+            post_data = json.loads(post_data)
+            solve_str = parse(post_data)
             self._set_response()
             self.wfile.write(bytearray((solve_str).encode('utf-8')))
         except Exception as e:
            self.send_error(404, 'error')
+
 
 
 def run_http_server():
@@ -57,7 +66,6 @@ def run_http_server():
     server_address = ('0.0.0.0', int(PORT))
     # server_address = ('127.0.0.1', 8080)
     httpd = http.server.HTTPServer(server_address, S)
-    print('http server is running...')
     httpd.serve_forever()
 
 def main():

@@ -8,7 +8,7 @@ def client_example():
         data = f.readlines()
         SCRAMBLE = data[0]
         SOLVE = " ".join(data[1:])
-    letter_pair_dict = load_letter_pairs_dict("sticker_letter_pairs.txt")
+    letter_pair_dict = load_letter_pairs_dict("sticker_HEB.txt")
     params_solve = { "DIFF_BETWEEN_ALGS" : 0.89,
               "SMART_CUBE": True,
               "COMMS_UNPARSED" :False,
@@ -25,10 +25,9 @@ def client_example():
               "MEMO" : 23.32
     }
 
-    r = requests.post("http://rotohands-bld-parser.herokuapp.com/", data=params_solve)
-    # r = requests.post("http://127.0.0.1:8080", data=params_solve)
+    # r = requests.post("http://rotohands-bld-parser.herokuapp.com/", data=params_solve)
+    r = requests.post("http://127.0.0.1:8080", data=params_solve)
     import pyperclip
-    print(r.text)
     pyperclip.copy(r.text)
 
 
