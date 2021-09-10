@@ -31,7 +31,7 @@ def parse(dict_params):
     cube = parse_solve(dict_params["SCRAMBLE"], dict_params["SOLVE"])
     if cube.smart_cube:
         cube = parse_smart_cube_solve(cube)
-    parsed_solve = json.dump(cube.parsed_solve)
+    parsed_solve = json.dumps(cube.parsed_solve)
     return parsed_solve
 
 class S(BaseHTTPRequestHandler):
