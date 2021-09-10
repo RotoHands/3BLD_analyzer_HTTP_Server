@@ -32,7 +32,7 @@ class Cube:
         self.time_solve = None
         self.algs_executed = []
         self.init_vars()
-
+        self.parsed_solve = {}
         self.currently_parsing_smart_cube = False
         self.corners_numbers = [1, 3, 7, 9, 10, 12, 16, 18, 19, 21, 25, 27, 28, 30, 34, 36, 37, 39, 43, 45, 46, 48, 52, 54]
         self.edges_numbers = [2, 4, 6, 8, 11, 13, 15, 17, 20, 22, 24, 26, 29, 31, 33, 35, 38, 40, 42, 44, 47, 49, 51, 53]
@@ -92,6 +92,7 @@ class Cube:
         # load_dotenv()
         self.smart_cube = True if os.environ.get("SMART_CUBE") == "True" else False
         self.gen_parsed_to_cubedb = True if os.environ.get("GEN_PARSED_TO_CUBEDB") == "True" else False
+        self.gen_parsed_to_txt=  True if os.environ.get("GEN_PARSED_TO_TXT") == "True" else False
         self.name_of_solve = os.environ.get("NAME_OF_SOLVE")
         self.time_solve = os.environ.get("TIME_SOLVE")
         self.comms_unparsed_bool = True if os.environ.get("COMMS_UNPARSED") == "True" else False
@@ -527,7 +528,7 @@ class Cube:
         for move in self.scramble.split():
             self.url += "{} ".format(move)
         self.url += "\n\nsolve:\n"
-
+        count = 0
         for move in self.solve_stats:
             if self.comms_unparsed_bool:
                 if move["comment"] != "":
@@ -559,7 +560,7 @@ class Cube:
                         self.url += "// {} \n".format(move["comment"])
                     else:
                         self.url += "// {} \n".format(move["comment"])
-
+        return self.url
     def gen_url(self):
         """
         generates the solve to cubedb.net url format
@@ -614,7 +615,7 @@ class Cube:
                         self.url += "// {} %0A".format(move["comment"])
                     else:
                         self.url += "// {} %0A".format(move["comment"])
-
+        return self.url
     def perm_to_string(self, perm):
         """
         converts permutation object to str
@@ -1098,9 +1099,9 @@ def parse_solve(scramble, solve_attampt):
     cube.find_mistake()
     # print(*cube.solve_stats, sep="\n")
     if cube.gen_parsed_to_cubedb:
-        cube.gen_url()
-    else:
-        cube.gen_solve_to_text()
+        cube.parsed_solve["cubedb"] = cube.gen_url()
+    if cube.gen_parsed_to_txt:
+        cube.parsed_solve["txt"] = cube.gen_solve_to_text()
     return cube
 
 def parse_smart_cube_solve(cube):

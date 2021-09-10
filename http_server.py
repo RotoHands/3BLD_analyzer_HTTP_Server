@@ -11,13 +11,13 @@ def init_env_var(dict_params):
 
     os.environ["SMART_CUBE"] = "True" if dict_params["SMART_CUBE"] == True else "False"
     os.environ["GEN_PARSED_TO_CUBEDB"] = "True" if dict_params["GEN_PARSED_TO_CUBEDB"] == True else "False"
+    os.environ["GEN_PARSED_TO_TXT"] = "True" if dict_params["GEN_PARSED_TO_TXT"] == True else "False"
     os.environ["NAME_OF_SOLVE"] = dict_params["NAME_OF_SOLVE"]
     os.environ["TIME_SOLVE"] = dict_params["TIME_SOLVE"]
     os.environ["COMMS_UNPARSED"] = "True" if dict_params["COMMS_UNPARSED"]  == True else "False"
     os.environ["GEN_WITH_MOVE_COUNT"] = "True" if dict_params["GEN_WITH_MOVE_COUNT"] == True else "False"
     os.environ["DIFF_BETWEEN_ALGS"] = dict_params["DIFF_BETWEEN_ALGS"]
     os.environ["PARSE_TO_LETTER_PAIR"] = "True" if dict_params["PARSE_TO_LETTER_PAIR"] == True else "False"
-    os.environ["GEN_WITH_MOVE_COUNT"] = "True" if dict_params["GEN_WITH_MOVE_COUNT"] == True else "False"
     os.environ["EDGES_BUFFER"] = dict_params["EDGES_BUFFER"]
     os.environ["CORNER_BUFFER"] = dict_params["CORNER_BUFFER"]
     os.environ["LETTER_PAIRS_DICT"] = dict_params["LETTER_PAIRS_DICT"]
@@ -31,8 +31,8 @@ def parse(dict_params):
     cube = parse_solve(dict_params["SCRAMBLE"], dict_params["SOLVE"])
     if cube.smart_cube:
         cube = parse_smart_cube_solve(cube)
-    solve_str = cube.url
-    return solve_str
+    parsed_solve = json.dump(cube.parsed_solve)
+    return parsed_solve
 
 class S(BaseHTTPRequestHandler):
     def _set_response(self):
@@ -55,7 +55,7 @@ class S(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)  # <--- Gets the data itself
             post_data = json.loads(post_data)
             solve_str = parse(post_data)
-            
+
             self._set_response()
             self.wfile.write(bytearray((solve_str).encode('utf-8')))
         except Exception as e:
