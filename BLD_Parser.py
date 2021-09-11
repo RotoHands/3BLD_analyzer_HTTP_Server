@@ -48,6 +48,7 @@ class Cube:
         self.solve = ""
         self.solve_helper = ""
         self.url = ""
+        self.success=False
         self.current_max_perm_list = None
         self.current_max_perm = None
         self.parity = None
@@ -55,6 +56,9 @@ class Cube:
         self.rotation = ['x', 'x\'', 'x2', 'z', 'z\'', 'z2', 'y', 'y\'', 'y2']
         self.last_solved_pieces = {}
         self.current_facelet = ""
+        self.memo_time = 0
+        self.exe_time = 0
+
 
         self.R = permutation.Permutation(1, 2, 21, 4, 5, 24, 7, 8, 27, 16, 13, 10, 17, 14, 11, 18, 15, 12, 19, 20, 30, 22, 23, 33, 25, 26, 36, 28, 29, 52, 31, 32, 49, 34, 35, 46, 37, 38, 39, 40, 41,42, 43, 44, 45, 9, 47, 48, 6, 50, 51, 3, 53, 54).inverse()
         self.RP = self.R.inverse()
@@ -520,11 +524,11 @@ class Cube:
         """
         generates the solve to a text format
         """
-        # success = True if self.solve_stats[-1]['cor'] == 8 and self.solve_stats[-1]['ed'] == 12 else False
-        # count = 0
+         # count = 0
         # self.url = "{}\n{} ({})".format(self.)
+        self.name_of_solve = "{}{}({}){}".format("DNF(" if not self.success else "", self.time_solve, self.memo_time,")" if not self.success else "")
 
-        self.url = "scramble: \n"
+        self.url = "\n\nscramble: \n"
         for move in self.scramble.split():
             self.url += "{} ".format(move)
         self.url += "\n\nsolve:\n"
@@ -550,35 +554,46 @@ class Cube:
                 if move["comment"] != "":
                     if "mistake" in move["comment"]:
                         move["comment"] = "{}\n//{}".format(move["comment"].split("mistake")[0], "mistake from here")
+
                     if "#" in move["comment"]:
                         piece = move["comment"].split("#")[0]
+
                         move["comment"] = move["comment"].split("#")[1]
                         if self.url.rfind("\n") != -1:
                             alg = self.url[self.url.rfind("\n") + 1:]
                             self.url = self.url[:self.url.rfind("\n") + 1] + "//{}\n".format(piece) + alg
+                        else:
+
+                            alg = self.url[self.url.rfind("=") + 1:]
+                            self.url = self.url[:self.url.rfind("=") + 1] + "//{}\n".format(piece) + alg
 
                         self.url += "// {} \n".format(move["comment"])
                     else:
                         self.url += "// {} \n".format(move["comment"])
+
         return self.url
     def gen_url(self):
         """
         generates the solve to cubedb.net url format
         """
-        self.url = "https://www.cubedb.net/?rank=3&title={}&time={}&scramble=".format(self.name_of_solve, self.time_solve)
+
+        self.name_of_solve = "{}{}({}){}".format("DNF(" if not self.success else "", self.time_solve, self.memo_time,")" if not self.success else "")
+        solve_stats_copy = list(self.solve_stats)
+        self.url = "https://www.cubedb.net/?rank=3&title={}&time={}&scramble=".format(self.name_of_solve, self.exe_time)
         for move in self.scramble.split():
             if "\'" in move:
                 move.replace("\'", "-")
             self.url += "{}_".format(move)
         self.url += "&alg="
         count = 0
-        for move in self.solve_stats:
+        for move in solve_stats_copy:
             if self.comms_unparsed_bool:
                 if self.comms_unparsed_bool:
                     if move["comment"] != "":
                         if "mistake" in move["comment"]:
                             move["comment"] = "{}%0A//{}".format(move["comment"].split("mistake")[0],
-                                                                 "mistake from here")
+                                                                "mistake from here")
+
                         if "#" in move["comment"]:
                             piece = move["comment"].split("#")[0]
                             move["comment"] = move["comment"].split("#")[1]
@@ -604,6 +619,7 @@ class Cube:
                         move["comment"] = "{}%0A//{}".format(move["comment"].split("mistake")[0], "mistake from here")
                     if "#" in move["comment"]:
                         piece = move["comment"].split("#")[0]
+
                         move["comment"] = move["comment"].split("#")[1]
                         if self.url.rfind("%0A") != -1:
                             alg = self.url[self.url.rfind("%0A") + 3:]
@@ -1098,10 +1114,16 @@ def parse_solve(scramble, solve_attampt):
 
     cube.find_mistake()
     # print(*cube.solve_stats, sep="\n")
+
+    cube.success = True if cube.solve_stats[-1]['cor'] == 8 and cube.solve_stats[-1]['ed'] == 12 else False
+    cube.memo_time = round(float(os.environ["MEMO"]), 2)
+    cube.time_solve = round(float(os.environ["TIME_SOLVE"]), 2)
+    cube.exe_time = cube.time_solve - cube.memo_time
     if cube.gen_parsed_to_cubedb:
         cube.parsed_solve["cubedb"] = cube.gen_url()
-    if cube.gen_parsed_to_txt:
+    else:
         cube.parsed_solve["txt"] = cube.gen_solve_to_text()
+
     return cube
 
 def parse_smart_cube_solve(cube):
