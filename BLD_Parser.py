@@ -1118,7 +1118,7 @@ def parse_solve(scramble, solve_attampt):
     cube.success = True if cube.solve_stats[-1]['cor'] == 8 and cube.solve_stats[-1]['ed'] == 12 else False
     cube.memo_time = round(float(os.environ["MEMO"]), 2)
     cube.time_solve = round(float(os.environ["TIME_SOLVE"]), 2)
-    cube.exe_time = cube.time_solve - cube.memo_time
+    cube.exe_time = round(cube.time_solve - cube.memo_time,2)
     if cube.gen_parsed_to_cubedb:
         cube.parsed_solve["cubedb"] = cube.gen_url()
     else:
