@@ -63,9 +63,9 @@ class S(BaseHTTPRequestHandler):
 
 
 def run_http_server():
-    # PORT = os.environ['PORT']
-    # server_address = ('0.0.0.0', int(PORT))
-    server_address = ('127.0.0.1', 8080)
+    PORT = os.environ['PORT']
+    server_address = ('0.0.0.0', int(PORT))
+    # server_address = ('127.0.0.1', 8080)
     httpd = http.server.HTTPServer(server_address, S)
     httpd.serve_forever()
 
