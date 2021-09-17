@@ -544,7 +544,23 @@ class Cube:
         self.pause_time = round(float(self.exe_time) - self.exe_no_pause_time,2)
         self.fluidness = round((self.exe_no_pause_time/float(self.exe_time))*100,2)
 
+    def union_moves(self,alg_str):
+        moves = alg_str.split(" ")
+        final_alg = []
+        count = 0
+        moves.append("G")
+        while len(moves) > 1:
+
+            if (moves[1] == moves[0]):
+                moves[1] = "{}2".format(moves[1][0])
+                moves.remove(moves[0])
+            final_alg.append(moves[0])
+            moves.remove(moves[0])
+
+        return " ".join(final_alg)
     def parse_to_slice_moves_second(self):
+
+
 
         if self.second_time:
             new_solve_stats = []
@@ -552,26 +568,28 @@ class Cube:
             for move in self.solve_stats:
                 if move['comment']:
                     info = move['comment']
-                    move['comment']['alg_str_original'] = move['comment']['alg_str'][0]
-                    move['comment']['alg_str_original'] = move['comment']['alg_str'][0]
-
                     if (info['piece_type'] == "edge"):
                         alg_to_parse = info['alg_str'][0]
-                        parsed_alg = self.parse_alg_to_slice_moves(alg_to_parse)
-
+                        parsed_alg = self.union_moves(self.parse_alg_to_slice_moves(alg_to_parse))
                         count_moves_from_start += len(parsed_alg.split(" "))
                         move['comment']['alg_str'][0] = parsed_alg
                         move['comment']['count_moves'] = len(parsed_alg.split(" "))
                         move['comment']['moves_from_start'] = count_moves_from_start
                     else:
+                        move['comment']['alg_str'][0] = self.union_moves(move['comment']['alg_str'][0])
+                        count_moves_from_start += len(move['comment']['alg_str'][0].split(" "))
+                        move['comment']['count_moves'] = len(move['comment']['alg_str'][0].split(" "))
                         count_moves_from_start += move['comment']['count_moves']
                         move['comment']['moves_from_start'] = count_moves_from_start
+                    move['comment']['alg_str_original'] = move['comment']['alg_str'][0]
     def gen_url_2(self):
 
         time = os.environ["DATE_SOLVE"]
+
         self.url = ""
         self.name_of_solve = "{}{}({}){}{}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
-                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""), "  {}".format(time))
+                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""), "%0A{}".format(time))
+
 
         solve_stats_copy = list(self.solve_stats)
         self.url = "https://www.cubedb.net/?rank=3&title={}&time={}&scramble=".format(self.name_of_solve, self.exe_time)
@@ -1121,17 +1139,18 @@ def parse_solve(scramble, solve_attampt, cube_import=None):
     cube.memo_time = convert_to_format(cube.memo_time)
     cube.time_solve = convert_to_format(cube.time_solve)
     cube.exe_time = convert_to_format(cube.exe_time)
-
     cube.calc_alg_times()
     cube.second_time = True
     if cube.smart_cube:
         cube.parse_to_slice_moves_second()
 
 
+
     if cube.gen_parsed_to_cubedb:
         cube.parsed_solve["cubedb"] = cube.gen_url_2()
     if cube.gen_parsed_to_txt:
         cube.parsed_solve["txt"] = cube.gen_text_2()
+
 
     return cube
 

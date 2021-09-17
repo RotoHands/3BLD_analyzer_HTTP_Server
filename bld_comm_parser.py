@@ -223,6 +223,21 @@ def solve_parser(solve):
         if comm not in description_words:
             solve += " " + str(alg_maker(comm))
     return (solve, solve_split)
+
+def union_moves(alg_str):
+    moves = alg_str.split(" ")
+    final_alg = []
+    count = 0
+    while len(moves) > 1:
+        print("{} : {}".format(moves[count + 1], moves[count]))
+        if (moves[1] == moves[0]):
+                moves[1] = "{}2".format(moves[1][0])
+                moves.remove(moves[0])
+        final_alg.append(moves[0])
+        moves.remove(moves[0])
+
+    return " ".join(final_alg)
+
 def main():
     pass
 if __name__ == '__main__':

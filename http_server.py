@@ -29,8 +29,6 @@ def init_env_var(dict_params):
 
 
 
-
-
 def parse(dict_params):
     init_env_var(dict_params)
     cube = parse_solve(dict_params["SCRAMBLE"], dict_params["SOLVE"])
