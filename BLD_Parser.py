@@ -18,6 +18,7 @@ class Cube:
 
         self.dict_stickers = {1: "UBL", 3: "UBR", 7: "UFL", 9: "UFR", 10: "RFU", 12: "RBU", 16: "RFD", 18: "RBD", 19: "FUL", 21: "FUR" , 25: "FDL",27: "FRD", 28: "DFL", 30: "DFR", 34: "DBL", 36: "DBR", 37: "LBU", 39: "LFU", 43: "LDB", 45: "LFD", 46: "BUR", 48: "BUL", 52: "BRD", 54: "BLD", 2: "UB", 4: "UL", 6: "UR", 8: "UF", 11: "RU", 13: "RF", 15: "RB", 17: "RD", 20: "FU", 22: "FL", 24: "FR", 26: "FD", 29: "DF", 31: "DL", 33: "DR", 35: "DB", 38: "LU", 40: "LB", 42: "LF", 44: "LD", 47: "BU", 49: "BR", 51: "BL", 53: "BD" }
 
+        self.gen_parsed_to_txt = None
         self.gen_with_moves = None
         self.smart_cube = None
         self.gen_parsed_to_cubedb = None
@@ -102,7 +103,7 @@ class Cube:
         # load_dotenv()
         self.smart_cube = True if os.environ.get("SMART_CUBE") == "True" else False
         self.gen_parsed_to_cubedb = True if os.environ.get("GEN_PARSED_TO_CUBEDB") == "True" else False
-        self.gen_parsed_to_txt=  True if os.environ.get("GEN_PARSED_TO_TXT") == "True" else False
+        self.gen_parsed_to_txt = True if os.environ.get("GEN_PARSED_TO_TXT") == "True" else False
         self.name_of_solve = os.environ.get("NAME_OF_SOLVE")
         self.time_solve = os.environ.get("TIME_SOLVE")
         self.comms_unparsed_bool = True if os.environ.get("COMMS_UNPARSED") == "True" else False
@@ -528,7 +529,6 @@ class Cube:
 
         if self.second_time:
             return
-        self.second_time=True
         self.exe_no_pause_time = 0
         count = 0
         for i in range(0,len(self.solve_stats)):
@@ -543,92 +543,33 @@ class Cube:
         self.pause_time = round(float(self.exe_time) - self.exe_no_pause_time,2)
         self.fluidness = round((self.exe_no_pause_time/float(self.exe_time))*100,2)
 
+    def parse_to_slice_moves_second(self):
 
-    def gen_solve_to_text(self):
-        """
-        generates the solve to a text format
-        """
-         # count = 0
-        # self.url = "{}\n{} ({})".format(self.)
-        self.name_of_solve = "{}{}({}){}".format("DNF(" if not self.success else "", self.time_solve, self.memo_time,")" if not self.success else "")
+        if self.second_time:
+            new_solve_stats = []
+            count_moves_from_start = 0
+            for move in self.solve_stats:
+                if move['comment']:
+                    info = move['comment']
+                    move['comment']['alg_str_original'] = move['comment']['alg_str'][0]
+                    move['comment']['alg_str_original'] = move['comment']['alg_str'][0]
 
-        self.url = "\n\nscramble: \n"
-        for move in self.scramble.split():
-            self.url += "{} ".format(move)
-        self.url += "\n\nsolve:\n"
-        count = 0
-        for move in self.solve_stats:
-            if self.comms_unparsed_bool:
-                if move["comment"] != "":
-                    if "mistake" in move["comment"]:
-                        move["comment"] = "{}\n//{}".format(move["comment"].split("mistake")[0], "mistake from here")
-                    if "#" in move["comment"]:
-                        piece = move["comment"].split("#")[0]
-                        move["comment"] = move["comment"].split("#")[1]
-                        if self.url.rfind("\n") != -1:
-                            alg = self.url[self.url.rfind("\n") + 1:]
-                            self.url = self.url[:self.url.rfind("\n") + 1] + "\n//{}\n".format(piece) + alg
-                    self.url += self.comms_unparsed[count]
-                    count += 1
-                    self.url += "// {} \n".format(move["comment"])
-            else:
-                if "move" in move:
-                    if move["move"] != "":
-                        self.url += "{} ".format(move["move"])
-                if move["comment"] != "":
-                    if "mistake" in move["comment"]:
-                        move["comment"] = "{}\n//{}".format(move["comment"].split("mistake")[0], "mistake from here")
+                    if (info['piece_type'] == "edge"):
+                        alg_to_parse = info['alg_str'][0]
+                        parsed_alg = self.parse_alg_to_slice_moves(alg_to_parse)
 
-                    if "#" in move["comment"]:
-                        piece = move["comment"].split("#")[0]
-
-                        move["comment"] = move["comment"].split("#")[1]
-                        if self.url.rfind("\n") != -1:
-                            alg = self.url[self.url.rfind("\n") + 1:]
-                            self.url = self.url[:self.url.rfind("\n") + 1] + "//{}\n".format(piece) + alg
-                        else:
-
-                            alg = self.url[self.url.rfind("=") + 1:]
-                            self.url = self.url[:self.url.rfind("=") + 1] + "//{}\n".format(piece) + alg
-
-                        self.url += "// {} \n".format(move["comment"])
+                        count_moves_from_start += len(parsed_alg.split(" "))
+                        move['comment']['alg_str'][0] = parsed_alg
+                        move['comment']['count_moves'] = len(parsed_alg.split(" "))
+                        move['comment']['moves_from_start'] = count_moves_from_start
                     else:
-                        self.url += "// {} \n".format(move["comment"])
-
-        return self.url
-    def gen_text_2(self):
+                        count_moves_from_start += move['comment']['count_moves']
+                        move['comment']['moves_from_start'] = count_moves_from_start
+    def gen_url_2(self):
+        self.url = ""
         self.name_of_solve = "{}{}({}){}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
                                                  ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""))
 
-        solve_stats_copy = list(self.solve_stats)
-
-        # self.url = "https://www.cubedb.net/?rank=3&title={}&time={}&scramble=".format(self.name_of_solve, self.exe_time)
-        for move in self.scramble.split():
-            if "\'" in move:
-                move.replace("\'", "-")
-            self.url += "{}_".format(move)
-        self.url += "&alg="
-        count = 0
-        solve = ""
-        solve = "{}\nScramble:\n{}\n".format(self.name_of_solve, self.scramble)
-        for move in solve_stats_copy:
-           if move['comment']:
-               info = move['comment']
-               print (info)
-               solve += "{}{} {}{}{}\n".format("\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "",info['alg_str'][0], "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info['moves_from_start']) if self.gen_with_move_count else "" ,"  {}".format(info['alg_time']))
-
-        self.url = solve
-        import pyperclip
-        pyperclip.copy(solve)
-        print(self.url)
-        return self.url
-
-    def gen_url(self):
-        """
-        generates the solve to cubedb.net url format
-        """
-
-        self.name_of_solve = "{}{}({}){}".format("DNF(" if not self.success else "", self.time_solve, self.memo_time,")" if not self.success else "")
         solve_stats_copy = list(self.solve_stats)
         self.url = "https://www.cubedb.net/?rank=3&title={}&time={}&scramble=".format(self.name_of_solve, self.exe_time)
         for move in self.scramble.split():
@@ -637,52 +578,32 @@ class Cube:
             self.url += "{}_".format(move)
         self.url += "&alg="
         count = 0
+        solve = ""
         for move in solve_stats_copy:
-            if self.comms_unparsed_bool:
-                if self.comms_unparsed_bool:
-                    if move["comment"] != "":
-                        if "mistake" in move["comment"]:
-                            move["comment"] = "{}%0A//{}".format(move["comment"].split("mistake")[0],
-                                                                "mistake from here")
+           if move['comment']:
+               info = move['comment']
+               solve += "{}{} {}{}{}\n".format("\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "",info['alg_str'][0], "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info['moves_from_start']) if self.gen_with_move_count else "" ,"  {}".format(info['alg_time']))
 
-                        if "#" in move["comment"]:
-                            piece = move["comment"].split("#")[0]
-                            move["comment"] = move["comment"].split("#")[1]
-                            if self.url.rfind("%0A") != -1:
-                                alg = self.url[self.url.rfind("%0A") + 3:]
-                                self.url = self.url[:self.url.rfind("%0A") + 3] + "%0A//{}%0A".format(piece) + alg
-                            else:
-                                alg = self.url[self.url.rfind("=") + 1:]
-                                self.url = self.url[:self.url.rfind("=") + 1] + "%0A//{}%0A".format(piece) + alg
-                        self.url += self.comms_unparsed[count]
-                        count += 1
-                        self.url += "// {} %0A".format(move["comment"])
-
-
-            else:
-                if "move" in move:
-                    if move["move"] != "":
-                        if "\'" in move["move"]:
-                            move["move"].replace("\'", "-")
-                        self.url += "{}_".format(move["move"])
-                if move["comment"] != "":
-                    if "mistake" in move["comment"]:
-                        move["comment"] = "{}%0A//{}".format(move["comment"].split("mistake")[0], "mistake from here")
-                    if "#" in move["comment"]:
-                        piece = move["comment"].split("#")[0]
-
-                        move["comment"] = move["comment"].split("#")[1]
-                        if self.url.rfind("%0A") != -1:
-                            alg = self.url[self.url.rfind("%0A") + 3:]
-                            self.url = self.url[:self.url.rfind("%0A") + 3] + "//{}%0A".format(piece) + alg
-                        else:
-                            alg = self.url[self.url.rfind("=") + 1:]
-                            self.url = self.url[:self.url.rfind("=") + 1] + "//{}%0A".format(piece) + alg
-
-                        self.url += "// {} %0A".format(move["comment"])
-                    else:
-                        self.url += "// {} %0A".format(move["comment"])
+        self.url += solve
+        self.url = self.url.replace("\n", "%0A")
         return self.url
+    def gen_text_2(self):
+        self.url = ""
+        self.name_of_solve = "{}{}({}){}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
+                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""))
+
+        solve_stats_copy = list(self.solve_stats)
+        solve = "{}\nScramble:\n{}\n".format(self.name_of_solve, self.scramble)
+        count = 0
+        for move in solve_stats_copy:
+           if move['comment']:
+               info = move['comment']
+               solve += "{}{} {}{}{}\n".format("\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "",info['alg_str'][0], "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info['moves_from_start']) if self.gen_with_move_count else "" ,"  {}".format(info['alg_time']))
+
+        self.url += solve
+        return self.url
+
+
     def perm_to_string(self, perm):
         """
         converts permutation object to str
@@ -1197,10 +1118,15 @@ def parse_solve(scramble, solve_attampt, cube_import=None):
     cube.exe_time = convert_to_format(cube.exe_time)
 
     cube.calc_alg_times()
+    cube.second_time = True
+    if cube.smart_cube:
+        cube.parse_to_slice_moves_second()
+
+
     if cube.gen_parsed_to_cubedb:
-        cube.parsed_solve["cubedb"] = cube.gen_text_2()
-    else:
-        cube.parsed_solve["txt"] = cube.gen_solve_to_text()
+        cube.parsed_solve["cubedb"] = cube.gen_url_2()
+    if cube.gen_parsed_to_txt:
+        cube.parsed_solve["txt"] = cube.gen_text_2()
 
     return cube
 
