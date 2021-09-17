@@ -23,11 +23,14 @@ def init_env_var(dict_params):
     os.environ["SCRAMBLE"] = dict_params["SCRAMBLE"]
     os.environ["SOLVE"] = dict_params["SOLVE"]
     os.environ["MEMO"] = dict_params["MEMO"]
+    os.environ["SOLVE_TIME_MOVES"] = dict_params["SOLVE_TIME_MOVES"]
+
 
 
 def parse(dict_params):
     init_env_var(dict_params)
     cube = parse_solve(dict_params["SCRAMBLE"], dict_params["SOLVE"])
+    print(cube.gen_url())
     if cube.smart_cube:
         cube = parse_smart_cube_solve(cube)
     parsed_solve = json.dumps(cube.parsed_solve)
@@ -63,9 +66,9 @@ class S(BaseHTTPRequestHandler):
 
 
 def run_http_server():
-    PORT = os.environ['PORT']
-    server_address = ('0.0.0.0', int(PORT))
-    # server_address = ('127.0.0.1', 8080)
+    # PORT = os.environ['PORT']
+    # server_address = ('0.0.0.0', int(PORT))
+    server_address = ('127.0.0.1', 8080)
     httpd = http.server.HTTPServer(server_address, S)
     httpd.serve_forever()
 
