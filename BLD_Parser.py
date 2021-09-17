@@ -5,6 +5,7 @@ import re
 from difflib import SequenceMatcher
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 def ERROR_FUNC():
     print("unknown move: ")
 
@@ -566,9 +567,11 @@ class Cube:
                         count_moves_from_start += move['comment']['count_moves']
                         move['comment']['moves_from_start'] = count_moves_from_start
     def gen_url_2(self):
+        time  = datetime.now()
+        time = "{}/{}/{} {}:{}".format(time.day,time.month, time.year, time.hour, time.minute)
         self.url = ""
-        self.name_of_solve = "{}{}({}){}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
-                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""))
+        self.name_of_solve = "{}{}({}){}{}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
+                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""), "\t{}".format(time))
 
         solve_stats_copy = list(self.solve_stats)
         self.url = "https://www.cubedb.net/?rank=3&title={}&time={}&scramble=".format(self.name_of_solve, self.exe_time)
@@ -588,9 +591,12 @@ class Cube:
         self.url = self.url.replace("\n", "%0A")
         return self.url
     def gen_text_2(self):
+        time = datetime.now()
+        time = "{}/{}/{} {}:{}".format(time.day, time.month, time.year, time.hour, time.minute)
+
         self.url = ""
-        self.name_of_solve = "{}{}({}){}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
-                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""))
+        self.name_of_solve = "{}{}({}){}{}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
+                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""), "\n{}\n".format(time))
 
         solve_stats_copy = list(self.solve_stats)
         solve = "{}\nScramble:\n{}\n".format(self.name_of_solve, self.scramble)
