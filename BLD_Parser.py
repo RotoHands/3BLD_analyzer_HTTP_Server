@@ -525,22 +525,24 @@ class Cube:
         return final_alg_str
 
     def calc_alg_times(self):
+
         if self.second_time:
             return
         self.second_time=True
         self.exe_no_pause_time = 0
+        count = 0
         for i in range(0,len(self.solve_stats)):
             j = i-1
             # print("{}.{} : {}\n{} : {} \n".format(i, "solve_stats", self.solve_stats[i], "move_time" , self.moves_time[j]))
-            if self.solve_stats[i]['comment']:
+            if 'parse_lp' in self.solve_stats[i]['comment']:
+                self.solve_stats[i]['comment']['alg_str'] = self.algs_executed[count]
+                count += 1
                 alg_time =round(self.moves_time[j] - self.moves_time[i - self.solve_stats[i]['diff_moves']], 2)
-                self.solve_stats[i]['alg_time'] = alg_time
                 self.exe_no_pause_time += alg_time
-                self.solve_stats[i]['comment'] += "  {}".format(alg_time)
+                self.solve_stats[i]['comment']['alg_time'] = alg_time
         self.pause_time = round(float(self.exe_time) - self.exe_no_pause_time,2)
         self.fluidness = round((self.exe_no_pause_time/float(self.exe_time))*100,2)
 
-        print(self.fluidness)
 
     def gen_solve_to_text(self):
         """
@@ -594,6 +596,33 @@ class Cube:
                         self.url += "// {} \n".format(move["comment"])
 
         return self.url
+    def gen_text_2(self):
+        self.name_of_solve = "{}{}({}){}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
+                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""))
+
+        solve_stats_copy = list(self.solve_stats)
+
+        # self.url = "https://www.cubedb.net/?rank=3&title={}&time={}&scramble=".format(self.name_of_solve, self.exe_time)
+        for move in self.scramble.split():
+            if "\'" in move:
+                move.replace("\'", "-")
+            self.url += "{}_".format(move)
+        self.url += "&alg="
+        count = 0
+        solve = ""
+        solve = "{}\nScramble:\n{}\n".format(self.name_of_solve, self.scramble)
+        for move in solve_stats_copy:
+           if move['comment']:
+               info = move['comment']
+               print (info)
+               solve += "{}{} {}{}{}\n".format("\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "",info['alg_str'][0], "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info['moves_from_start']) if self.gen_with_move_count else "" ,"  {}".format(info['alg_time']))
+
+        self.url = solve
+        import pyperclip
+        pyperclip.copy(solve)
+        print(self.url)
+        return self.url
+
     def gen_url(self):
         """
         generates the solve to cubedb.net url format
@@ -980,9 +1009,9 @@ class Cube:
         """
         finds the last point in the solve that you executed correctly
         """
-        if self.solve_stats[-1]["comment"] == "":
+        if not self.solve_stats[-1]["comment"]["parse_lp"]:
             for stat in reversed(self.solve_stats):
-                if stat["comment"] != "":
+                if stat["comment"]["parse_lp"]:
                     self.solve_stats[stat["count"]]["comment"]["mistake"] = "mistake from here"
                     break
 
@@ -1146,15 +1175,14 @@ def parse_solve(scramble, solve_attampt, cube_import=None):
                     comment["parse_lp"] = " ".join(comm[:])
 
                 if piece != cube.flag_piece_type:
-                    comment["piece_change"] = "piece"
+                    comment["piece_change"] = piece
                     cube.flag_piece_type = piece
                 cube.solve_stats.append({"count" : count,"move": original_move,"piece" : piece, "diff_moves": count_moves, "ed" : solved_edges,"cor" :  solved_cor, "comment" : comment,  "diff" : diff, "perm" : cube.perm_to_string(cube.current_perm)})
         else:
-            cube.solve_stats.append({"count" : count,"move": original_move,"ed" : solved_edges,"cor" :  solved_cor, "comment" : "" , "diff" : diff, "perm" : cube.perm_to_string(cube.current_perm)})
+            cube.solve_stats.append({"count" : count,"move": original_move,"ed" : solved_edges,"cor" :  solved_cor, "comment" : {} , "diff" : diff, "perm" : cube.perm_to_string(cube.current_perm)})
 
     if current_alg:
         cube.algs_executed.append([" ".join(current_alg), piece_type])
-
     cube.find_mistake()
     # print(*cube.solve_stats, sep="\n")
 
@@ -1168,10 +1196,9 @@ def parse_solve(scramble, solve_attampt, cube_import=None):
     cube.time_solve = convert_to_format(cube.time_solve)
     cube.exe_time = convert_to_format(cube.exe_time)
 
-    print(cube.solve_stats)
     cube.calc_alg_times()
     if cube.gen_parsed_to_cubedb:
-        cube.parsed_solve["cubedb"] = cube.gen_url()
+        cube.parsed_solve["cubedb"] = cube.gen_text_2()
     else:
         cube.parsed_solve["txt"] = cube.gen_solve_to_text()
 
@@ -1184,7 +1211,6 @@ def parse_smart_cube_solve(cube):
     cube.smart_cube = False
     SCRAMBLE = cube.scramble
     SOLVE = ""
-    print("dffd", cube.algs_executed)
 
     for comm in cube.algs_executed:
         if comm[1]["edge"] or comm[1]["parity"]:

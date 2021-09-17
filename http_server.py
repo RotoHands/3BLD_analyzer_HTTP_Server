@@ -30,7 +30,6 @@ def init_env_var(dict_params):
 def parse(dict_params):
     init_env_var(dict_params)
     cube = parse_solve(dict_params["SCRAMBLE"], dict_params["SOLVE"])
-    print(cube.gen_url())
     if cube.smart_cube:
         cube = parse_smart_cube_solve(cube)
     parsed_solve = json.dumps(cube.parsed_solve)
