@@ -599,7 +599,7 @@ class Cube:
 
         solve_stats_copy = list(self.solve_stats)
         self.url = "https://www.cubedb.net/?rank=3&title={}&time={}&scramble=".format(self.name_of_solve, self.exe_time)
-        for move in self.scramble.split():
+        for move in self.union_moves(self.scramble).split():
             if "\'" in move:
                 move.replace("\'", "-")
             self.url += "{}_".format(move)
@@ -630,7 +630,7 @@ class Cube:
                                                  ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""), "\n{}\n".format(time))
 
         solve_stats_copy = list(self.solve_stats)
-        solve = "{}\nScramble:\n{}\n".format(self.name_of_solve, self.scramble)
+        solve = "{}\nScramble:\n{}\n".format(self.name_of_solve, self.union_moves(self.scramble))
         count = 0
         for move in solve_stats_copy:
             if move['comment']:
@@ -1094,7 +1094,7 @@ def parse_solve(scramble, solve_attampt, cube_import=None):
         solved_edges =  cube.count_solve_edges()
         solved_cor = cube.count_solved_cor()
         diff = cube.diff_states(cube.perm_to_string(cube.current_perm))
-        if diff > cube.diff_to_solved_state and (count - max_piece_place >= 4):
+        if diff > cube.diff_to_solved_state and (count - max_piece_place >= 4) and diff != 1:
             temp_count = count - max_piece_place
             max_piece_place = count
             cube.last_solved_pieces = cube.diff_solved_state()
