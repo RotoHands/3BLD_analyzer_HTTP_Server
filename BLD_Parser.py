@@ -545,7 +545,7 @@ class Cube:
         self.fluidness = round((self.exe_no_pause_time/float(self.exe_time))*100,2)
 
     def union_moves(self,alg_str):
-        moves = alg_str.split(" ")
+        moves = alg_str.split()
         final_alg = []
         count = 0
         moves.append("G")
@@ -569,20 +569,25 @@ class Cube:
             count_moves_from_start = 0
             for move in self.solve_stats:
                 if move['comment']:
-                    info = move['comment']
-                    if (info['piece_type'] == "edge"):
-                        alg_to_parse = info['alg_str'][0]
-                        parsed_alg = self.union_moves(self.parse_alg_to_slice_moves(alg_to_parse))
-                        count_moves_from_start += len(parsed_alg.split(" "))
-                        move['comment']['alg_str'][0] = parsed_alg
-                        move['comment']['count_moves'] = len(parsed_alg.split(" "))
-                        move['comment']['moves_from_start'] = count_moves_from_start
+                    if 'mistake' not in move['comment']:
+                        info = move['comment']
+                        if (info['piece_type'] == "edge"):
+                            alg_to_parse = info['alg_str'][0]
+                            parsed_alg = self.union_moves(self.parse_alg_to_slice_moves(alg_to_parse))
+                            count_moves_from_start += len(parsed_alg.split())
+                            move['comment']['alg_str'][0] = parsed_alg
+                            move['comment']['count_moves'] = len(parsed_alg.split())
+                            move['comment']['moves_from_start'] = count_moves_from_start
+                        else:
+                            move['comment']['alg_str'][0] = self.union_moves(move['comment']['alg_str'][0])
+                            move['comment']['count_moves'] = len(move['comment']['alg_str'][0].split())
+                            count_moves_from_start += move['comment']['count_moves']
+                            move['comment']['moves_from_start'] = count_moves_from_start
+                        move['comment']['alg_str_original'] = move['comment']['alg_str'][0]
                     else:
-                        move['comment']['alg_str'][0] = self.union_moves(move['comment']['alg_str'][0])
-                        move['comment']['count_moves'] = len(move['comment']['alg_str'][0].split(" "))
-                        count_moves_from_start += move['comment']['count_moves']
+                        move['comment']['count_moves'] = len(move['comment']['alg_str'][0].split())
+                        count_moves_from_start += len(move['comment']['alg_str'][0].split())
                         move['comment']['moves_from_start'] = count_moves_from_start
-                    move['comment']['alg_str_original'] = move['comment']['alg_str'][0]
     def gen_url_2(self):
 
         time = os.environ["DATE_SOLVE"]
@@ -601,10 +606,18 @@ class Cube:
         self.url += "&alg="
         count = 0
         solve = ""
+
         for move in solve_stats_copy:
-           if move['comment']:
-               info = move['comment']
-               solve += "{}{} {}{}{}\n".format("\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "",info['alg_str'][0], "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info['moves_from_start']) if self.gen_with_move_count else "" ,"  {}".format(info['alg_time']))
+            if move['comment']:
+                info = move['comment']
+                if 'mistake' in info:
+                    solve += "\n//{}  {}/{}\n{}".format(info['mistake'], info['count_moves'], info['moves_from_start'],
+                                                        info['alg_str'][0])
+                else:
+                    solve += "{}{} {}{}{}\n".format(
+                        "\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "", info['alg_str'][0],
+                        "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info[
+                            'moves_from_start']) if self.gen_with_move_count else "", "  {}".format(info['alg_time']))
 
         self.url += solve
         self.url = self.url.replace("\n", "%0A")
@@ -620,9 +633,16 @@ class Cube:
         solve = "{}\nScramble:\n{}\n".format(self.name_of_solve, self.scramble)
         count = 0
         for move in solve_stats_copy:
-           if move['comment']:
-               info = move['comment']
-               solve += "{}{} {}{}{}\n".format("\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "",info['alg_str'][0], "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info['moves_from_start']) if self.gen_with_move_count else "" ,"  {}".format(info['alg_time']))
+            if move['comment']:
+                info = move['comment']
+                if 'mistake' in info:
+                    solve += "\n//{}  {}/{}\n{}".format(info['mistake'], info['count_moves'], info['moves_from_start'],
+                                                        info['alg_str'][0])
+                else:
+                    solve += "{}{} {}{}{}\n".format(
+                        "\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "", info['alg_str'][0],
+                        "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info[
+                            'moves_from_start']) if self.gen_with_move_count else "", "  {}".format(info['alg_time']))
 
         self.url += solve
         return self.url
@@ -954,11 +974,18 @@ class Cube:
         """
         finds the last point in the solve that you executed correctly
         """
-        if not self.solve_stats[-1]["comment"]["parse_lp"]:
+
+        mistake_alg = ""
+        if 'parse_lp' not in self.solve_stats[-1]["comment"]:
             for stat in reversed(self.solve_stats):
-                if stat["comment"]["parse_lp"]:
-                    self.solve_stats[stat["count"]]["comment"]["mistake"] = "mistake from here"
+                if 'parse_lp' in stat["comment"]:
+                    for i in range(stat["count"] + 1,len(self.solve_stats)):
+                        mistake_alg += self.solve_stats[i]['move'] + " "
+                    mistake_alg = self.union_moves(mistake_alg)
+                    self.solve_stats[stat["count"] + 1]["comment"]["mistake"] = "mistake from here"
+                    self.solve_stats[stat['count'] + 1]['comment']['alg_str'] = [mistake_alg]
                     break
+        print("here 2")
 
 def keep_comms_unparsed(solve):
     """
