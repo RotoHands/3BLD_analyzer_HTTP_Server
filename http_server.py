@@ -4,7 +4,7 @@ from http.server import  BaseHTTPRequestHandler
 from werkzeug import urls
 import os
 import json
-from BLD_Parser import parse_solve, parse_smart_cube_solve
+from BLD_Parser import parse_solve
 
 def init_env_var(dict_params):
 
