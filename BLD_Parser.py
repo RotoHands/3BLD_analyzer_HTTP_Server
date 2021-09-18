@@ -549,6 +549,9 @@ class Cube:
         final_alg = []
         count = 0
         moves.append("G")
+        for m in moves:
+            if m == '':
+                moves.remove(m)
         while len(moves) > 1:
 
             if (moves[1] == moves[0]):
@@ -556,12 +559,11 @@ class Cube:
                 moves.remove(moves[0])
             final_alg.append(moves[0])
             moves.remove(moves[0])
-
         return " ".join(final_alg)
     def parse_to_slice_moves_second(self):
 
-
-
+        print(self.solve_stats)
+        print("here")
         if self.second_time:
             new_solve_stats = []
             count_moves_from_start = 0
@@ -577,7 +579,6 @@ class Cube:
                         move['comment']['moves_from_start'] = count_moves_from_start
                     else:
                         move['comment']['alg_str'][0] = self.union_moves(move['comment']['alg_str'][0])
-                        count_moves_from_start += len(move['comment']['alg_str'][0].split(" "))
                         move['comment']['count_moves'] = len(move['comment']['alg_str'][0].split(" "))
                         count_moves_from_start += move['comment']['count_moves']
                         move['comment']['moves_from_start'] = count_moves_from_start
