@@ -117,7 +117,8 @@ class Cube:
         self.path_to_lp = "sticker_letter_pairs.txt" #os.environ.get("PATH_LETTER_PAIR_FILE")
         # self.dict_lp = self.load_letter_pairs_dict()
         self.dict_lp = ast.literal_eval(os.environ.get("LETTER_PAIRS_DICT"))
-        self.moves_time = [float(i) for i in ast.literal_eval((os.environ["SOLVE_TIME_MOVES"]))]
+        if len(os.environ["SOLVE_TIME_MOVES"]) > 0:
+            self.moves_time = [float(i) for i in ast.literal_eval((os.environ["SOLVE_TIME_MOVES"]))]
 
     def r(self):
         self.current_perm =  self.R * self.current_perm
@@ -527,7 +528,9 @@ class Cube:
         return final_alg_str
 
     def calc_alg_times(self):
-
+        print(self.moves_time)
+        with_time = True if len(self.moves_time) > 0 else False
+        print(with_time)
         if self.second_time:
             return
         self.exe_no_pause_time = 0
@@ -539,11 +542,13 @@ class Cube:
             if 'parse_lp' in self.solve_stats[i]['comment']:
                 self.solve_stats[i]['comment']['alg_str'] = self.algs_executed[count]
                 count += 1
-                alg_time =round(self.moves_time[j] - self.moves_time[i - self.solve_stats[i]['diff_moves']], 2)
-                self.exe_no_pause_time += alg_time
-                self.solve_stats[i]['comment']['alg_time'] = alg_time
-        self.pause_time = round(float(self.exe_time) - self.exe_no_pause_time,2)
-        self.fluidness = round((self.exe_no_pause_time/float(self.exe_time))*100,2)
+                if with_time:
+                    alg_time =round(self.moves_time[j] - self.moves_time[i - self.solve_stats[i]['diff_moves']], 2)
+                    self.exe_no_pause_time += alg_time
+                    self.solve_stats[i]['comment']['alg_time'] = alg_time
+        if with_time:
+            self.pause_time = round(float(self.exe_time) - self.exe_no_pause_time,2)
+            self.fluidness = round((self.exe_no_pause_time/float(self.exe_time))*100,2)
 
     def union_moves(self,alg_str):
         moves = alg_str.split()
@@ -563,8 +568,6 @@ class Cube:
         return " ".join(final_alg)
     def parse_to_slice_moves_second(self):
 
-        print(self.solve_stats)
-        print("here")
 
         if self.second_time:
             new_solve_stats = []
@@ -596,7 +599,7 @@ class Cube:
 
         self.url = ""
         self.name_of_solve = "{}{}({}){}{}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
-                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""), "%0A{}".format(time))
+                                                 ")" if not self.success else "", "  {}%25".format(round(self.fluidness, 2)) if self.success and self.fluidness != 0 else "", "%0A{}".format(time))
 
 
         solve_stats_copy = list(self.solve_stats)
@@ -619,17 +622,18 @@ class Cube:
                     solve += "{}{} {}{}{}\n".format(
                         "\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "", info['alg_str'][0],
                         "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info[
-                            'moves_from_start']) if self.gen_with_move_count else "", "  {}".format(info['alg_time']))
+                            'moves_from_start']) if self.gen_with_move_count else "", "  {}".format(info['alg_time'] if 'alg_time' in info else ""))
 
         self.url += solve
         self.url = self.url.replace("\n", "%0A")
         return self.url
     def gen_text_2(self):
+
         time = os.environ["DATE_SOLVE"]
 
         self.url = ""
-        self.name_of_solve = "{}{}({}){}{}{}".format("DNF(" if not self.success else "", self.time_solve, "{},{}".format(self.memo_time,self.exe_time),
-                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2) if self.success else ""), "\n{}\n".format(time))
+        self.name_of_solve = "{}{}({}){}{}{}".format("DNF(" if not self.success else "", self.time_solve if time != None else "", "{},{}".format(self.memo_time,self.exe_time),
+                                                 ")" if not self.success else "", "  {}%".format(round(self.fluidness, 2)) if self.success and self.fluidness != 0 else "", "\n{}\n".format(time))
 
         solve_stats_copy = list(self.solve_stats)
         solve = "{}\nScramble:\n{}\n".format(self.name_of_solve, self.union_moves(self.scramble))
@@ -644,7 +648,7 @@ class Cube:
                     solve += "{}{} {}{}{}\n".format(
                         "\n//{}\n".format(info['piece_change']) if 'piece_change' in info else "", info['alg_str'][0],
                         "// {}".format(info['parse_lp']), "  {}/{}".format(info['count_moves'], info[
-                            'moves_from_start']) if self.gen_with_move_count else "", "  {}".format(info['alg_time']))
+                            'moves_from_start']) if self.gen_with_move_count else "", "  {}".format(info['alg_time']) if 'alg_time' in info else "")
 
         self.url += solve
         return self.url
@@ -987,7 +991,6 @@ class Cube:
                     self.solve_stats[stat["count"] + 1]["comment"]["mistake"] = "mistake from here"
                     self.solve_stats[stat['count'] + 1]['comment']['alg_str'] = [mistake_alg]
                     break
-        print("here 2")
 
 def keep_comms_unparsed(solve):
     """
@@ -1175,6 +1178,7 @@ def parse_solve(scramble, solve_attampt, cube_import=None):
     cube.memo_time = convert_to_format(cube.memo_time)
     cube.time_solve = convert_to_format(cube.time_solve)
     cube.exe_time = convert_to_format(cube.exe_time)
+
     cube.calc_alg_times()
     cube.second_time = True
     if cube.smart_cube:
