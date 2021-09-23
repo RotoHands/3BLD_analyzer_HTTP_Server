@@ -2,3 +2,4 @@ pyperclip
 python-dotenv
 permutation
 werkzeug
+psycopg2

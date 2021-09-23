@@ -33,7 +33,7 @@ class Cube:
         self.name_of_solve = None
         self.time_solve = None
         self.algs_executed = []
-        self.parsed_solve = {}
+        self.parsed_solve = {"txt": '', "cubedb": ''}
         self.currently_parsing_smart_cube = False
         self.corners_numbers = [1, 3, 7, 9, 10, 12, 16, 18, 19, 21, 25, 27, 28, 30, 34, 36, 37, 39, 43, 45, 46, 48, 52, 54]
         self.edges_numbers = [2, 4, 6, 8, 11, 13, 15, 17, 20, 22, 24, 26, 29, 31, 33, 35, 38, 40, 42, 44, 47, 49, 51, 53]
@@ -65,6 +65,7 @@ class Cube:
         self.exe_no_pause_time = 0
         self.fluidness = 0
         self.second_time = False
+        self.date = None
         self.init_vars()
 
 
@@ -116,6 +117,7 @@ class Cube:
         self.buffer_cor = self.get_buffer_cor(os.environ.get("CORNER_BUFFER"))
         self.path_to_lp = "sticker_letter_pairs.txt" #os.environ.get("PATH_LETTER_PAIR_FILE")
         # self.dict_lp = self.load_letter_pairs_dict()
+        self.date = os.environ["DATE_SOLVE"] if len(os.environ["DATE_SOLVE"]) > 0 else ''
         self.dict_lp = ast.literal_eval(os.environ.get("LETTER_PAIRS_DICT"))
         if len(os.environ["SOLVE_TIME_MOVES"]) > 0:
             self.moves_time = [float(i) for i in ast.literal_eval((os.environ["SOLVE_TIME_MOVES"]))]

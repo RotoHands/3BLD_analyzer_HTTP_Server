@@ -5,7 +5,7 @@ from werkzeug import urls
 import os
 import json
 from BLD_Parser import parse_solve
-
+from DB_LOGS import add_log_of_request
 def init_env_var(dict_params):
 
 
@@ -33,7 +33,7 @@ def parse(dict_params):
     init_env_var(dict_params)
     cube = parse_solve(dict_params["SCRAMBLE"], dict_params["SOLVE"])
     parsed_solve = json.dumps(cube.parsed_solve)
-    return parsed_solve
+    return (parsed_solve,cube)
 
 class S(BaseHTTPRequestHandler):
     def _set_response(self):
@@ -45,22 +45,24 @@ class S(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200, "ok")
         self.send_header('Access-Control-Allow-Origin', '*')
-        # self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        # self.send_header('Access-Control-Allow-Credentials', 'true')
         self.send_header('Access-Control-Allow-Headers', "*")
         self.end_headers()
 
     def do_POST(self):
         try:
             content_length = int(self.headers['Content-Length'])  # <--- Gets the size of data
-            post_data = self.rfile.read(content_length)  # <--- Gets the data itself
-            post_data = json.loads(post_data)
-            solve_str = parse(post_data)
-
+            request = self.rfile.read(content_length)  # <--- Gets the data itself
+            post_data = json.loads(request)
+            data = parse(post_data)
+            solve_str = data[0]
+            cube = data[1]
+            address = self.client_address[0]
             self._set_response()
             self.wfile.write(bytearray((solve_str).encode('utf-8')))
+            add_log_of_request(request, address, '200', cube)
         except Exception as e:
-           self.send_error(404, 'error')
+            add_log_of_request(request, address, '404')
+            self.send_error(404, 'error')
 
 
 
