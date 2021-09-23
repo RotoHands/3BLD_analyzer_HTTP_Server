@@ -52,7 +52,6 @@ class S(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            print("herer")
             content_length = int(self.headers['Content-Length'])  # <--- Gets the size of data
             post_data = self.rfile.read(content_length)  # <--- Gets the data itself
             post_data = json.loads(post_data)
