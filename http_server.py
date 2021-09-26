@@ -4,6 +4,7 @@ from http.server import  BaseHTTPRequestHandler
 from werkzeug import urls
 import os
 import json
+import traceback
 from BLD_Parser import parse_solve
 from DB_LOGS import add_log_of_request
 def init_env_var(dict_params):
@@ -26,6 +27,8 @@ def init_env_var(dict_params):
     os.environ["MEMO"] = dict_params["MEMO"]
     os.environ["SOLVE_TIME_MOVES"] = dict_params["SOLVE_TIME_MOVES"]
     os.environ["DATE_SOLVE"] = dict_params["DATE_SOLVE"]
+    os.environ["ID"] = dict_params["ID"]
+
 
 
 
@@ -33,6 +36,7 @@ def parse(dict_params):
     init_env_var(dict_params)
     cube = parse_solve(dict_params["SCRAMBLE"], dict_params["SOLVE"])
     parsed_solve = json.dumps(cube.parsed_solve)
+
     return (parsed_solve,cube)
 
 class S(BaseHTTPRequestHandler):
@@ -50,18 +54,24 @@ class S(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
+            address = self.client_address[0]
+
             content_length = int(self.headers['Content-Length'])  # <--- Gets the size of data
             request = self.rfile.read(content_length)  # <--- Gets the data itself
             post_data = json.loads(request)
+
             data = parse(post_data)
             solve_str = data[0]
             cube = data[1]
-            address = self.client_address[0]
             self._set_response()
             self.wfile.write(bytearray((solve_str).encode('utf-8')))
-            add_log_of_request(request, address, '200', cube)
+            try:
+                add_log_of_request(request, address, '200', cube)
+            except Exception as e:
+                add_log_of_request(request, address, '404',error=traceback.format_exc())
         except Exception as e:
-            add_log_of_request(request, address, '404')
+            traceback.format_exc()
+            add_log_of_request(request, address, '404', error=traceback.format_exc())
             self.send_error(404, 'error')
 
 
