@@ -3,7 +3,8 @@
 #### check Client_Example.html to see the format of the fetch request.
 [TrainBLD.com](https://www.trainbld.com/) - [github repo](https://github.com/RotoHands/TrainBLD)  check the web timer I developed to show Proof Of Concept for using this HTTP server
 
-If you are a webtimer develooper and you need help to implement this feature feel free to contact - Rotohands@gmail.com
+If you are a webtimer developer and you need help to implement this feature feel free to contact - Rotohands@gmail.com  
+If you have more ideas to improve/features feel free to suggest :)
 
 ### Reconsruction features
 - commutator seperation
