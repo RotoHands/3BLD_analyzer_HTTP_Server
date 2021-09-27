@@ -82,11 +82,13 @@ for more information check this [post](https://www.speedsolving.com/threads/smar
 P.S
 Thanks for [CSTIMER](https://github.com/cs0x7f/cstimer/blob/fc627f0970d8982c758200430bb60d7554f984b0/src/js/bluetooth.js) for the bluetooth implementation for smart cubes
 
+
+
+# Original - 2021-06
 Hi,
 After [last year](https://www.speedsolving.com/threads/3bld-dnf-analyzer-new-software-i-made.76945/) software attempt of making a more efficient way to train 3bld, here is this year version!
 I worked on a new version for the last couple of months and focused mainly on analyzing 3bld solves.
 
-# Original - 2021-06
 main features:
 - separating the solve commutators
 - tracking the commutator and converting to letter pairs
