@@ -1,7 +1,8 @@
 # UPDATE - 2021-09
 #### This is a HTTP server that can get Rubiks blindfolded solves and return them analyzed
 #### check Client_Example.html to see the format of the fetch request.
-[TrainBLD.com](https://www.trainbld.com/) - [github repo](https://github.com/RotoHands/TrainBLD)  check the web timer I developed to show Proof Of Concept for using this HTTP server
+[TrainBLD.com](https://www.trainbld.com/) [github repo](https://github.com/RotoHands/TrainBLD)  [Post](https://www.speedsolving.com/threads/trainbld-new-web-timer-that-reconstructs-your-3bld-solves.85466/)  
+check the web timer I developed to show Proof Of Concept for using this HTTP server
 
 If you are a webtimer developer and you need help to implement this feature feel free to contact - Rotohands@gmail.com  
 If you have more ideas to improve/features feel free to suggest :)
