@@ -34,46 +34,36 @@ D' F' D B' F L' F L U U R' U D' F U F' D U' R U L F' L' B'
 F U F U' B F' U R' D R U' R D' R' U' R D R' U R' D' R F' U
 R' D' R U U R' D R U F U' R' U' R' D' R U R' D R R U R U R
 U R' D D U' U R U' R' D D U' R' R R D R' U U R D' R' U' R' 
-F' R U R' U' R' F R R U' R' U'
+F' R U R' U' R' F R R U' R' U' //solve
 </p>
 </details>
 
 <details>
   <summary>parsed</summary>
 
-<p>
+
 14/9 35.97(0.44,35.53)  51.51%
 
 F2 L2 U B2 U' F2 U L' D' B R F' R U' F2 R' B' R B D' R2 U B //scramble
 
 //edges
 R' U' R2 S R2 S' U R // JA  8/8  1.74
-  
-U' R E' R' U R R' R E R' // BH  10/18  1.08
-  
-L F L' E L F' L' E' // PL  8/26  0.88
-  
-L F' E R2 E' R2 F L' // NU  8/34  1.23
-  
-S L' F' L S' L' F L // VG  8/42  1.89
-  
-U2 R' E R U R' E' R U // FD  9/51  0.75
-  
-L F' L' S' L F L' S // EB  8/59  1.48
+U' R E' R' U R R' R E R' // BH  10/18  1.08  
+L F L' E L F' L' E' // PL  8/26  0.88  
+L F' E R2 E' R2 F L' // NU  8/34  1.23  
+S L' F' L S' L' F L // VG  8/42  1.89  
+U2 R' E R U R' E' R U // FD  9/51  0.75  
+L F' L' S' L F L' S // EB  8/59  1.48  
 
 //corners
-U R' D R U' R D' R' U' R D R' U R' D' R // VB  16/75  1.39
-  
-F' U R' D' R U2 R' D R U F // LN  11/86  1.92
-  
-U' R' U' R' D' R U R' D R2 U // DR  11/97  1.52
-  
-R U R U R' D2 U' U R U' R' D2 U' R' // TX  14/111  2.11
+U R' D R U' R D' R' U' R D R' U R' D' R // VB  16/75  1.39  
+F' U R' D' R U2 R' D R U F // LN  11/86  1.92  
+U' R' U' R' D' R U R' D R2 U // DR  11/97  1.52  
+R U R U R' D2 U' U R U' R' D2 U' R' // TX  14/111  2.11  
 
 //parity
 R2 D R' U2 R D' R' U' R' F' R U R' U' R' F R2 U' R' U' // CB CI  20/131  2.31
  
-</p>
 </details>
 
 for more information check this [post](https://www.speedsolving.com/threads/smart-cube-bld-analyzer.84773/)
