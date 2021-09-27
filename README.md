@@ -1,7 +1,9 @@
 # UPDATE - 2021-09
 ## Main feature
 The main feature is the added HTTP server functionality.
+
 check Client_Example.html to check the format of the fetch request.
+
 everyone can send solves to https://rotohands-bld-parser.herokuapp.com/ in a HTTP reauest and you will get the analyzed solve in the response.
 
 check the web timer I developed to show Proof Of Concept for using this HTTP server
