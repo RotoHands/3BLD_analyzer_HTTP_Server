@@ -10,12 +10,14 @@
           EDGES_BUFFER: "UF",
           TIME_SOLVE: "28.16",
           MEMO: "2.68",
+          CUBE_OREINTATION: "white-green",
           DATE_SOLVE: "9/18/2021, 09:52 PM", // you can leave empty
           DIFF_BETWEEN_ALGS: "0.87", //if the commutator seperation doesn't work well, change to 0.86-0.89 and send again
           GEN_PARSED_TO_CUBEDB: true, //link to cubedb
           GEN_PARSED_TO_TXT: true, //get solve in text format
           GEN_WITH_MOVE_COUNT: true,
-          ID: "ASDERUJNFG", 
+          ID: "OVEOrO3Wp9", 
+          SCRAMBLE_TYPE: "3x3",
           LETTER_PAIRS_DICT: //letter scheme, use JSON.stringify(YOUR_LETTER_PAIR_DICT)
             '{"UBL":"A","UBR":"B","UFR":"C","UFL":"D","LBU":"E","LFU":"F","LFD":"G","LDB":"H","FUL":"I","FUR":"J","FRD":"K","FDL":"L","RFU":"M","RBU":"N","RBD":"O","RFD":"P","BUR":"Q","BUL":"R","BLD":"S","BRD":"T","DFL":"U","DFR":"V","DBR":"W","DBL":"X","UB":"A","UR":"B","UF":"C","UL":"D","LU":"E","LF":"F","LD":"G","LB":"H","FU":"I","FR":"J","FD":"K","FL":"L","RU":"M","RB":"N","RD":"O","RF":"P","BU":"Q","BL":"R","BD":"S","BR":"T","DF":"U","DR":"V","DB":"W","DL":"X"}',
           NAME_OF_SOLVE: "", //not relevant, leave empty
@@ -35,7 +37,7 @@
           },
           body: JSON.stringify(parse_settings),
         };
-        fetch("https://rotohands-bld-parser.herokuapp.com/", requestOptions).then(
+        fetch("https://trainbld.com/parse", requestOptions).then(
           (response) =>
             response.json().then((data) => {
               let result = data;
@@ -49,4 +51,3 @@
         <div id="solve" style="white-space: pre-line"> </div>
       </body>
 </html>
-
